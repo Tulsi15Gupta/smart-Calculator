@@ -3,210 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <title>Smart Calculator</title>
-  <style>
-    body {
-      background: #f4f4f4;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 40px;
-      padding: 10px;
-    }
-    .calculator {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 90%;
-      max-width: 340px;
-    }
-    * {
-  box-sizing: border-box;
-}
 
-input[type="text"] {
-  width: 100%;
-  height: 45px;
-  font-size: 22px;
-  margin-bottom: 10px;
-  text-align: right;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    .buttons input, .buttons button {
-      height: 45px;
-      font-size: 18px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #ddd;
-    }
-    #history {
-      margin-top: 20px;
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 340px;
-    }
-    body.dark-mode {
-      background: #222;
-      color: white;
-    }
-    body.dark-mode .calculator,
-    body.dark-mode #history {
-      background: #444;
-      color: white;
-      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
-    }
-    body.dark-mode .buttons input,
-    body.dark-mode .buttons button {
-      background-color: #666;
-      color: white;
-    }
-    @media (max-width: 500px) {
-      .buttons input, .buttons button {
-        font-size: 16px;
-        height: 42px;
-      }
-      input[type="text"] {
-        font-size: 20px;
-      }
-    }
-  </style>
+  <!-- Linking External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+  <!-- ================= CALCULATOR UI ================= -->
   <div class="calculator">
+
+    <!-- Display box for showing input & results -->
     <input type="text" id="display" readonly>
+
+    <!-- Calculator Buttons Grid -->
     <div class="buttons">
+
+      <!-- Row 1: Brackets, Square, Square Root -->
       <input type="button" value="(" onclick="append('(')">
       <input type="button" value=")" onclick="append(')')">
       <input type="button" value="x²" onclick="Square()">
       <input type="button" value="√" onclick="SquareRoot()">
 
+      <!-- Row 2 -->
       <input type="button" value="7" onclick="append('7')">
       <input type="button" value="8" onclick="append('8')">
       <input type="button" value="9" onclick="append('9')">
       <input type="button" value="/" onclick="append('/')">
 
+      <!-- Row 3 -->
       <input type="button" value="4" onclick="append('4')">
       <input type="button" value="5" onclick="append('5')">
       <input type="button" value="6" onclick="append('6')">
       <input type="button" value="*" onclick="append('*')">
 
+      <!-- Row 4 -->
       <input type="button" value="1" onclick="append('1')">
       <input type="button" value="2" onclick="append('2')">
       <input type="button" value="3" onclick="append('3')">
       <input type="button" value="-" onclick="append('-')">
 
+      <!-- Row 5 -->
       <input type="button" value="0" onclick="append('0')">
       <input type="button" value="." onclick="append('.')">
       <input type="button" value="%" onclick="append('%')">
       <input type="button" value="+" onclick="append('+')">
 
+      <!-- Row 6: Calculate, Clear, Theme, Clear History -->
       <input type="button" value="=" onclick="calculate()">
       <input type="button" value="C" onclick="clearDisplay()">
       <button onclick="toggletheme()">Mode</button>
       <button onclick="clearHistory()">Clear</button>
+
     </div>
   </div>
 
+  <!-- =================== HISTORY SECTION =================== -->
   <div id="history"></div>
 
-  <script>
-    let lastAnswer = "";
+  <!-- External JavaScript File -->
+  <script src="script.js"></script>
 
-    function append(char) {
-      document.getElementById("display").value += char;
-    }
-
-    function clearDisplay() {
-      document.getElementById("display").value = "";
-    }
-
-    function calculate() {
-      try {
-        let display = document.getElementById("display");
-        let expression = display.value;
-        if (expression.trim() === "") return;
-        let result = eval(expression.replace(/%/g, "/100"));
-        display.value = result;
-        lastAnswer = result;
-        saveToHistory(expression + " = " + result);
-      } catch {
-        document.getElementById("display").value = "Error";
-      }
-    }
-
-    function toggletheme() {
-      document.body.classList.toggle("dark-mode");
-    }
-
-    function saveToHistory(entry) {
-      let history = JSON.parse(localStorage.getItem("calcHistory")) || [];
-      history.push(entry);
-      localStorage.setItem("calcHistory", JSON.stringify(history));
-      showHistory();
-    }
-
-    function showHistory() {
-      let historyDiv = document.getElementById("history");
-      let history = JSON.parse(localStorage.getItem("calcHistory")) || [];
-      if (history.length === 0) {
-        historyDiv.innerHTML = "<h3>History</h3><p>No entries</p>";
-        return;
-      }
-      historyDiv.innerHTML = "<h3>History</h3><ul>" + history.map(item => `<li>${item}</li>`).join("") + "</ul>";
-    }
-
-    function clearHistory() {
-      localStorage.removeItem("calcHistory");
-      showHistory();
-    }
-
-    function Square() {
-      let display = document.getElementById("display");
-      let value = display.value;
-      if (!isNaN(value) && value !== "") {
-        let result = Math.pow(Number(value), 2);
-        display.value = result;
-        saveToHistory(value + "² = " + result);
-      }
-    }
-
-    function SquareRoot() {
-      let display = document.getElementById("display");
-      let value = display.value;
-      if (!isNaN(value) && value !== "") {
-        let result = Math.sqrt(Number(value));
-        display.value = result;
-        saveToHistory("√" + value + " = " + result);
-      }
-    }
-
-    document.addEventListener("keydown", function (event) {
-      const key = event.key;
-      if (!isNaN(Number(key)) || "+-*/().".includes(key)) {
-        append(key);
-      } else if (key === "Enter") {
-        calculate();
-      } else if (key === "Backspace") {
-        let display = document.getElementById("display");
-        display.value = display.value.slice(0, -1);
-      } else if (key.toLowerCase() === "c") {
-        clearDisplay();
-      }
-    });
-
-    window.onload = showHistory;
-  </script>
 </body>
 </html>
